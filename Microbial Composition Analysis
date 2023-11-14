@@ -1,0 +1,34 @@
+#####   alpha diversity   #####
+info<-read.csv('sample_info_no_multibam.csv',row.names=1)
+info$cms_merge[which(is.na(info$cms_merge))]='Mixed-CMS'
+info$cms_merge[which(info$cms_merge=='NOLBL')]='Mixed-CMS'
+info<-subset(info,info$cms_merge!='Mixed-CMS')
+microbes<-microbes[rownames(info),]
+
+microbes<-read.csv('TCGA_RNA_cri3_barcode.csv',row.names=1)
+survival_info<-read.csv('TCGA_RNA_survival_nmf.csv',row.names=1)
+
+#Shannon/Simpson
+Shannon <- diversity(t(otu_Flattening), index = 'shannon', base = exp(1))
+Gini_simpson  <- diversity(t(otu_Flattening), index = 'simpson')
+
+#####   beta diversity   #####
+microbes<-read.csv('TCGA_RNA_cri3_barcode_nng.csv',row.names=1)
+meta_RNA<-read.csv('meta_RNA_with_submitter_id_barcode.csv',row.names=1)
+
+library(vegan)
+library(ggplot2)
+library(ggrepel)
+library(ade4)
+distance<-vegdist(microbes,method='bray')
+
+pcoa<-cmdscale(distance,k=(nrow(microbes)-1),eig=TRUE)
+plot_data<-data.frame({pcoa$point})[1:2]
+names(plot_data)<-c('PCoA1','PCoA2')
+eig<-pcoa$eig
+data<-plot_data[match(rownames(info),rownames(plot_data)),]
+data<-data.frame(info,plot_data,meta_RNA[rownames(info),])
+
+#####   ANOSIM   #####
+library(vegan)
+anosim=anosim(microbes, info[rownames(microbes),]$cms_merge, permutations=9999)
