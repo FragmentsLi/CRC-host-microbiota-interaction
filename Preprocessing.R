@@ -16,7 +16,7 @@ write.csv(combat_data,'TCGAbiolinks_combat_data_tumor.csv',row.names=T)
 
 ######   CMS classification   ######
 
-data<-read.csv('TCGAbiolinks_combat_data_tumor.csv',row.names=1,check.names=F)
+data<-combat_data
 
 library(clusterProfiler)
 library(org.Hs.eg.db)
@@ -51,3 +51,22 @@ cms_merge[which(is.na(cms_merge))]='NOLBL'
 info<-data.frame(barcode=barcode,patient_id=patient_id,cms_class=cms_class,
                  cms_predict=cms_predict,cms_nearest=cms_nearest,cms_merge=cms_merge)
 write.csv(info,'TCGA_microbes/sample_info_no_multibam_tumor_rf.csv',row.names=F)                         
+
+######   PCA   ######
+data<-read.csv('TCGAbiolinks_RSEM_normalized_data.csv',row.names=1,check.names=F)
+combat_data<-read.csv('TCGAbiolinks_combat_data_tumor.csv',row.names=1,check.names=F)
+data<-data[,colnames(combat_data)]
+meta_RNA<-read.csv('meta_RNA_with_submitter_id_barcode.csv',row.names=1)
+
+#remove genes with expression equal to 0
+combat_data<-combat_data[which(rowSums(data)!=0),]
+
+#PCA
+pca <- prcomp(t(combat_data), scale=TRUE)
+pca.data <- data.frame(Sample=rownames(pca$x),
+                       X=pca$x[,1],
+                       Y=pca$x[,2])
+pca.var <- pca$sdev^2
+pca.var.per <- round(pca.var/sum(pca.var)*100,1)
+
+                         
