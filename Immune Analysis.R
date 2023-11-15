@@ -12,7 +12,6 @@ write.csv(result,'TCGA_CIBERSORT.csv')
 library(estimate)
 
 ## start analysis
-#exp.file = "TCGAbiolinks_combat_data_tumor.txt"
 exp.file = "TCGAbiolinks_combat_data.txt"
 in.gct.file = "ESTIMATE_input_ALL.gct"
 outputGCT(exp.file, in.gct.file)
