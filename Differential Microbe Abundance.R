@@ -1,6 +1,7 @@
 microbes_raw<-read.csv('TCGA_RNA_cri3_raw_barcode.csv',row.names=1)
-microbes<-read.csv('/data3/data/JN/CRC/TCGA_microbes/TCGA_RNA_cri3_barcode.csv',row.names=1)
+microbes<-read.csv('TCGA_RNA_cri3_barcode.csv',row.names=1)
 
+#prevlence>20%
 microbes<-microbes[,which(unlist(apply(microbes_raw,2,function(x){sum(x>0)/length(x)}))>0.2)]
 
 info<-read.csv('sample_info_no_multibam_tumor_rf.csv',row.names=1)
